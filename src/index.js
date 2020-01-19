@@ -59,7 +59,7 @@ export const App = props => {
       <p>Score: {score}</p>
     </div>
     <canvas
-      className='border border-green-300 mx-auto w-4/5'
+      className='border border-green-300 mx-auto w-full md:w-4/5'
       ref={ref}
       height={height}
       width={width}
