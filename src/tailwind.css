@@ -6,6 +6,37 @@
 
 @tailwind components;
 
+.d-pad {
+  display: grid;
+  height: 100vw;
+  grid-template: 1fr 1fr 1fr / 1fr 1fr 1fr;
+  grid-template-areas: 
+    '. up .'
+    'left . right'
+    '. down .';
+}
+
+.d-button {
+  @apply bg-gray-600 shadow-lg rounded-lg cursor-pointer;
+  font-size: 15vw;
+}
+
+.up {
+  grid-area: up;
+}
+
+.down {
+  grid-area: down;
+}
+
+.right {
+  grid-area: right;
+}
+
+.left {
+  grid-area: left;
+}
+
 @tailwind utilities;
 
 @responsive {

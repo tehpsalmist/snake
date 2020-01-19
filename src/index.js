@@ -30,15 +30,19 @@ export const App = props => {
     }
   }, 1000 / speed)
 
+  const dPadEventHandler = direction => {
+    if (!gameActive && !isDead) {
+      setGameActive(true)
+    }
+
+    directionController.push(direction)
+  }
+
   useKeyDownListener(e => {
     if (dPad[e.which]) {
       e.preventDefault()
 
-      if (!gameActive && !isDead) {
-        setGameActive(true)
-      }
-
-      directionController.push(dPad[e.which])
+      dPadEventHandler(dPad[e.which])
     }
   })
 
@@ -49,13 +53,20 @@ export const App = props => {
   }, [isDead])
 
   return <main>
-    <div className='flex justify-evenly items-end'>
+    <div className='flex justify-evenly items-center my-2'>
       <div className='flex-center'>
         <button className='text-xl w-8 h-8 border rounded shadow focus:outline-none focus:bg-blue-400 focus:text-white      ' onClick={e => setSpeed(s => gameActive || s < 2 ? s : s - 1)}>-</button>
         <p className='mx-3'>Speed: {speed} m/s</p>
         <button className='text-xl w-8 h-8 border rounded shadow focus:outline-none focus:bg-blue-400 focus:text-white      ' onClick={e => setSpeed(s => gameActive || s > 9 ? s : s + 1)}>+</button>
       </div>
-      <h1 className='text-3xl text-center'>Snek</h1>
+      {gameActive && !isDead
+        ? <button
+          className='px-2 py-1 shadow-md bg-red-300 text-red-700 rounded'
+          onClick={e => !isDead && setGameActive(false)}
+        >
+          Pause
+        </button>
+        : <h1 className='text-3xl text-center'>Snek</h1>}
       <p>Score: {score}</p>
     </div>
     <canvas
@@ -64,14 +75,8 @@ export const App = props => {
       height={height}
       width={width}
     />
-    <div className='flex-center mt-4'>
-      {gameActive && !isDead && <button
-        className='mx-auto p-2 shadow-md bg-red-300 text-red-700 rounded'
-        onClick={e => !isDead && setGameActive(false)}
-      >
-        Pause
-      </button>}
-      {isDead && <button
+    {isDead && <div className='flex-center my-4'>
+      <button
         className='mx-auto p-2 shadow-md bg-green-300 text-green-700 rounded'
         onClick={e => {
           setGameActive(false)
@@ -81,7 +86,13 @@ export const App = props => {
         }}
       >
         New Game
-      </button>}
+      </button>
+    </div>}
+    <div className='d-pad'>
+      <button className='up d-button' onClick={e => dPadEventHandler('up')}>U</button>
+      <button className='down d-button' onClick={e => dPadEventHandler('down')}>D</button>
+      <button className='left d-button' onClick={e => dPadEventHandler('left')}>L</button>
+      <button className='right d-button' onClick={e => dPadEventHandler('right')}>R</button>
     </div>
   </main>
 }
