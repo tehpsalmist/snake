@@ -32,5 +32,6 @@
   "dependencies": {
     "react": "latest",
     "react-dom": "latest"
-  }
+  },
+  "browserslist": "last 2 Chrome versions"
 }

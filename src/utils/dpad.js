@@ -43,6 +43,11 @@ class DirectionController {
       this.queue.push(direction)
     }
   }
+
+  clear () {
+    this.direction = 'right'
+    this.queue = []
+  }
 }
 
 export const directionController = new DirectionController()

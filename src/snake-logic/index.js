@@ -42,7 +42,7 @@ export const advance = ctx => {
 
 const nextBoard = board => {
   const snake = board.snake.slice()
-  const apple = board.apple
+  let apple = board.apple
 
   const direction = directionController.take()
 
@@ -54,19 +54,26 @@ const nextBoard = board => {
   const y = nextY(currentHead.y, direction)
   const from = oppositeOf[direction]
 
-  const newHead = { x, y, from }
+  const newHead = { x, y, from, hasEaten: apple.x === x && apple.y === y }
 
   snake.unshift(newHead)
 
-  if (apple.x === x && apple.y === y) {
-    newHead.hasEaten = true
-  } else {
+  if (!newHead.hasEaten) {
     snake.pop()
+  } else {
+    apple = nextApple(checkMap(snake))
+  }
+
+  const projectedY = nextY(y, direction)
+  const projectedX = nextX(x, direction)
+
+  if (projectedX === apple.x && projectedY === apple.y) {
+    newHead.aboutToEat = true
   }
 
   return {
     snake,
-    apple: newHead.hasEaten ? nextApple(checkMap(snake)) : apple
+    apple
   }
 }
 
