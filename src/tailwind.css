@@ -8,17 +8,33 @@
 
 .d-pad {
   display: grid;
-  height: 100vw;
-  grid-template: 1fr 1fr 1fr / 1fr 1fr 1fr;
+  height: 65vw;
+  grid-template: 1fr 1fr 1fr 1fr / 1fr 1fr 1fr;
   grid-template-areas: 
     '. up .'
-    'left . right'
+    'left up right'
+    'left down right'
     '. down .';
+  gap: 1rem;
 }
 
 .d-button {
   @apply bg-gray-600 shadow-lg rounded-lg cursor-pointer;
   font-size: 15vw;
+}
+
+@screen md {
+  .d-button {
+    @apply text-4xl;
+  }
+
+  .d-pad {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    height: 250px;
+    width: 400px;
+  }
 }
 
 .up {
