@@ -1,5 +1,9 @@
 @tailwind base;
 
+* {
+  touch-action: manipulation;
+}
+
 @tailwind components;
 
 @tailwind utilities;
