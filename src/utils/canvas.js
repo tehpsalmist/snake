@@ -8,6 +8,7 @@ export const boxSize = 100
 const halfBoxSize = boxSize / 2
 const tenthBoxSize = boxSize / 10
 const twentieth = boxSize / 20
+const hundredth = boxSize / 100
 
 const snakePattern = [
   'green', // middle
@@ -30,7 +31,16 @@ function actualSize (number) {
  * @param {SnakeSegment} segment
  * @param {CanvasRenderingContext2D} ctx
  */
-export const drawSnakeHead = ({ x, y, from, aboutToEat }, ctx) => {
+export const drawSnakeHead = ({ aboutToEat, ...segment }, ctx) => {
+  return aboutToEat ? drawSnakeHeadMouthOpened(segment, ctx) : drawSnakeHeadMouthClosed(segment, ctx)
+}
+
+/**
+ * Draw the snake's head with mouth closed
+ * @param {SnakeSegment} segment
+ * @param {CanvasRenderingContext2D} ctx
+ */
+export const drawSnakeHeadMouthClosed = ({ x, y, from }, ctx) => {
   const actualX = actualSize(x)
   const actualY = actualSize(y)
 
@@ -87,11 +97,11 @@ export const drawSnakeHead = ({ x, y, from, aboutToEat }, ctx) => {
   // eye
   ctx.fillStyle = '#444'
   ctx.beginPath()
-  ctx.arc(eyeX, eyeY, twentieth, 0, 2 * Math.PI)
+  ctx.ellipse(eyeX, eyeY, twentieth, twentieth / 2, getRotation(from, Math.PI / 20), 0, 2 * Math.PI)
   ctx.fill()
 
   // tongue
-  if (!aboutToEat && Math.floor(Math.random() * 10) >= 8) {
+  if (Math.floor(Math.random() * 10) >= 8) {
     ctx.strokeStyle = 'red'
     ctx.lineCap = 'round'
     ctx.lineJoin = 'bevel'
@@ -105,6 +115,76 @@ export const drawSnakeHead = ({ x, y, from, aboutToEat }, ctx) => {
 
     ctx.stroke()
   }
+}
+
+/**
+ * Draw the snake's head with mouth opened
+ * @param {SnakeSegment} segment
+ * @param {CanvasRenderingContext2D} ctx
+ */
+export const drawSnakeHeadMouthOpened = ({ x, y, from }, ctx) => {
+  const actualX = actualSize(x)
+  const actualY = actualSize(y)
+
+  const getXY = createXYFactory(from, actualX, actualY)
+
+  const begin = getXY(0, 25)
+  const upperLip = getXY(70, 12)
+  const topTooth = getXY(73, 35)
+  const cornerOfMouth = getXY(15, 50)
+  const bottomTooth = getXY(73, 65)
+  const lowerLip = getXY(70, 88)
+  const end = getXY(0, 75)
+
+  // teeth
+  ctx.strokeStyle = 'gray'
+  ctx.lineWidth = hundredth
+
+  ctx.beginPath()
+  ctx.moveTo(...getXY(67, 13))
+  ctx.bezierCurveTo(...getXY(72, 22), ...getXY(72, 22),...topTooth)
+  ctx.bezierCurveTo(...getXY(68, 26), ...getXY(68, 26),...getXY(58, 20))
+  ctx.stroke()
+
+  ctx.beginPath()
+  ctx.moveTo(...getXY(67, 87))
+  ctx.bezierCurveTo(...getXY(72, 78), ...getXY(72, 78),...bottomTooth)
+  ctx.bezierCurveTo(...getXY(68, 74), ...getXY(68, 74),...getXY(58, 80))
+  ctx.stroke()
+
+  // tongue
+  ctx.strokeStyle = 'red'
+  ctx.lineWidth = twentieth / 2
+  ctx.lineCap = 'round'
+  ctx.lineJoin = 'bevel'
+
+  ctx.beginPath()
+  ctx.moveTo(...getXY(25, 57))
+  ctx.bezierCurveTo(...getXY(35, 54), ...getXY(35, 54), ...getXY(45, 54))
+  ctx.lineTo(...getXY(53, 52))
+  ctx.moveTo(...getXY(45, 54))
+  ctx.lineTo(...getXY(53, 58))
+  ctx.stroke()
+
+  // head
+  ctx.fillStyle = 'green'
+  ctx.strokeStyle = 'green'
+
+  ctx.beginPath()
+  ctx.moveTo(...begin)
+  ctx.bezierCurveTo(...getXY(50, 10), ...getXY(60, 5), ...upperLip)
+  ctx.lineTo(...cornerOfMouth)
+  ctx.lineTo(...lowerLip)
+  ctx.bezierCurveTo(...getXY(60, 95), ...getXY(50, 90), ...end)
+  ctx.closePath()
+  ctx.fill()
+
+  // eye
+  ctx.fillStyle = '#444'
+
+  ctx.beginPath()
+  ctx.ellipse(...getXY(27, 25), twentieth, twentieth / 2, -0.2, 0, 2 * Math.PI)
+  ctx.fill()
 }
 
 /**
@@ -132,6 +212,7 @@ export const drawSnakeBody = ({ x, y, from, to, hasEaten }, ctx) => {
     const bezierCoords = [cpX, cpY, cpX, cpY, ...endCoords]
 
     ctx.strokeStyle = color
+    ctx.lineCap = 'square'
     ctx.beginPath()
     ctx.moveTo(...beginCoords)
     ctx.bezierCurveTo(...bezierCoords)
@@ -214,6 +295,11 @@ export const drawApple = ({ x, y }, ctx) => {
   ctx.stroke()
 }
 
+/**
+ * 
+ * @param {{ x: number, y: number }} segment
+ * @param {CanvasRenderingContext2D} ctx 
+ */
 const drawFullBelly = ({ x, y }, ctx) => {
   const middleX = actualSize(x) + halfBoxSize
   const middleY = actualSize(y) + halfBoxSize
@@ -231,9 +317,41 @@ const drawFullBelly = ({ x, y }, ctx) => {
   ctx.fill()
 }
 
-export const drawBoard = ({ snake, apple }, ctx) => {
+/**
+ * 
+ * @param {{ x: number, y: number }[]} poops
+ * @param {CanvasRenderingContext2D} ctx 
+ */
+export const drawPoops = (poops, ctx) => {
+  poops.forEach(poop => drawPoop(poop, ctx))
+  /**
+   * 
+   * @param {{ x: number, y: number }} poop
+   * @param {CanvasRenderingContext2D} ctx 
+   */
+  function drawPoop ({ x, y }, ctx) {
+    const actualX = actualSize(x)
+    const actualY = actualSize(y)
+
+    const getXY = createXYFactory('left', actualX, actualY)
+
+    ctx.fillStyle = 'brown'
+    ctx.beginPath()
+    ctx.ellipse(...getXY(50, 40), 12, 12, 0, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.beginPath()
+    ctx.ellipse(...getXY(50, 50), 20, 12, 0, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.beginPath()
+    ctx.ellipse(...getXY(50, 60), 25, 12, 0, 0, Math.PI * 2)
+    ctx.fill()
+  }
+}
+
+export const drawBoard = ({ snake, apple, poops }, ctx) => {
   ctx.clearRect(0, 0, width, height)
 
+  drawPoops(poops, ctx)
   drawSnake(snake, ctx)
   drawApple(apple, ctx)
 }
@@ -276,7 +394,7 @@ function * getTongueCoords (x, y, from) {
  * @param {number} x
  * @param {number} y
  * 
- * @returns {number[]}
+ * @returns {[number, number]}
  */
 function relativeToCenterOfEdge (side, x, y, { enterOffset = 0, exitOffset = 0 } = { enterOffset: 0, exitOffset: 0 }) {
   switch (side) {
@@ -298,7 +416,7 @@ function relativeToCenterOfEdge (side, x, y, { enterOffset = 0, exitOffset = 0 }
  * @param {number} x
  * @param {number} y
  * 
- * @returns {number[]}
+ * @returns {[number, number]}
  */
 function towardCenterFromDirection (distance, from, x, y) {
   switch (from) {
@@ -311,4 +429,37 @@ function towardCenterFromDirection (distance, from, x, y) {
     case 'right':
       return [x - distance, y]
   }
+}
+
+function getRotation (from, rotation) {
+  switch (from) {
+    case 'down':
+      return (Math.PI / 2) + rotation
+    case 'up':
+      return -(Math.PI / 2) + rotation
+    case 'left':
+      return rotation
+    case 'right':
+      return Math.PI - rotation
+  }
+}
+
+function createXYFactory (from, actualX, actualY) {
+  const getXY = (desiredX, desiredY) => {
+    const xOffset = desiredX * hundredth
+    const yOffset = desiredY * hundredth
+
+    switch (from) {
+      case 'down':
+        return [actualX + yOffset, (actualY + boxSize) - xOffset]
+      case 'up':
+        return [(actualX + boxSize) - yOffset, actualY + xOffset]
+      case 'left':
+        return [actualX + xOffset, actualY + yOffset]
+      case 'right':
+        return [(actualX + boxSize) - xOffset, actualY + yOffset]
+    }
+  }
+
+  return getXY
 }

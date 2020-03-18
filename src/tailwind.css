@@ -37,6 +37,12 @@
   }
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .d-pad {
+    display: none;
+  }
+}
+
 .up {
   grid-area: up;
 }

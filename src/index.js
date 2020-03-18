@@ -11,6 +11,7 @@ export const App = props => {
   const ref = useRef()
   const [gameActive, setGameActive] = useState(false)
   const [isDead, setIsDead] = useState(false)
+  const [showDPad, setShowDPad] = useState(false)
   const [score, setScore] = useState(0)
   const [speed, setSpeed] = useState(4)
   

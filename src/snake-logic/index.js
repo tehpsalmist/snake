@@ -6,7 +6,7 @@ const gridWidth = width / boxSize
 const gridHeight = height / boxSize
 
 const startingSnakeSegments = 8
-const firstSnakeHeadX = (gridWidth / 2) - Math.floor(startingSnakeSegments / 2)
+const firstSnakeHeadX = (gridWidth / 2) + Math.floor(startingSnakeSegments / 2)
 
 export const createGame = ctx => {
   const firstSnake = Array(startingSnakeSegments)
@@ -15,7 +15,7 @@ export const createGame = ctx => {
 
   const firstApple = nextApple(checkMap(firstSnake))
 
-  currentBoard = { snake: firstSnake, apple: firstApple }
+  currentBoard = { snake: firstSnake, apple: firstApple, poops: [] }
 
   drawBoard(currentBoard, ctx)
 }
@@ -25,7 +25,7 @@ export const advance = ctx => {
 
   currentBoard = nextBoard(currentBoard)
 
-  if (willCollide(currentBoard.snake)) {
+  if (willCollide(currentBoard.snake, currentBoard.poops)) {
     result.dead = true
 
     return result
@@ -64,23 +64,32 @@ const nextBoard = board => {
     apple = nextApple(checkMap(snake))
   }
 
+  const tail = snake[snake.length - 1]
+
+  if (tail.hasEaten) {
+    board.poops.push({ x: tail.x, y: tail.y })
+  }
+
+  const poops = board.poops.length > 10 ? board.poops.slice(1) : board.poops
+
   const projectedY = nextY(y, direction)
   const projectedX = nextX(x, direction)
 
-  if (projectedX === apple.x && projectedY === apple.y) {
+  if ((projectedX === apple.x && projectedY === apple.y) || checkMap(poops)[`${projectedX}-${projectedY}`]) {
     newHead.aboutToEat = true
   }
 
   return {
     snake,
-    apple
+    apple,
+    poops
   }
 }
 
 const nextApple = (check) => {
   const appleCandidate = {
-    x: Math.floor(Math.random() * (width / boxSize)),
-    y: Math.floor(Math.random() * (height / boxSize))
+    x: Math.floor(Math.random() * gridWidth),
+    y: Math.floor(Math.random() * gridHeight)
   }
 
   if (check[`${appleCandidate.x}-${appleCandidate.y}`]) {
@@ -90,17 +99,20 @@ const nextApple = (check) => {
   return appleCandidate
 }
 
-const willCollide = snake => {
-  const check = {}
+const willCollide = (snake, poops) => {
+  const snakeCheck = {}
+  const tailIndex = snake.length - 1
+  const poopCheck = checkMap(poops)
 
-  return snake.some(({ x, y }) => {
+  return snake.some(({ x, y }, i) => {
+    const isTail = i === tailIndex
     const coordinates = `${x}-${y}`
 
-    if (check[coordinates]) {
+    if (snakeCheck[coordinates] || (!isTail && poopCheck[coordinates])) {
       return true
     }
 
-    check[coordinates] = 1
+    snakeCheck[coordinates] = 1
   })
 }
 
