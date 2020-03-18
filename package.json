@@ -26,6 +26,7 @@
   "homepage": "https://github.com/tehpsalmist/snake#readme",
   "devDependencies": {
     "@fullhuman/postcss-purgecss": "latest",
+    "minimist": "^1.2.5",
     "parcel": "^1.12.4",
     "tailwindcss": "latest"
   },
