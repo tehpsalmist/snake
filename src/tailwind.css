@@ -71,12 +71,4 @@
   .flex-center {
     @apply flex justify-center items-center;
   }
-
-  .justify-evenly {
-    justify-content: space-evenly;
-  }
-
-  .grid {
-    display: grid;
-  }
 }
