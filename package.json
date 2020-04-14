@@ -28,7 +28,7 @@
     "@fullhuman/postcss-purgecss": "latest",
     "minimist": "^1.2.5",
     "parcel": "^1.12.4",
-    "tailwindcss": "latest"
+    "tailwindcss": "^1.2.0"
   },
   "dependencies": {
     "react": "latest",
