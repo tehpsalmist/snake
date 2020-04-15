@@ -9,6 +9,7 @@ import { createGame, advance } from './snake-logic'
 
 export const App = props => {
   const ref = useRef()
+  const newGameRef = useRef()
   const [name, setName] = useState(localStorage.getItem('snek-name') ?? 'Anonymous')
   const [gameActive, setGameActive] = useState(false)
   const [isDead, setIsDead] = useState(false)
@@ -59,6 +60,10 @@ export const App = props => {
     if (!isDead) {
       createGame(ref.current.getContext('2d'))
     }
+
+    if (isDead) {
+      newGameRef.current.focus()
+    }
   }, [isDead])
 
   return <main>
@@ -87,6 +92,7 @@ export const App = props => {
     />
     {isDead && <div className='flex-center my-4'>
       <button
+        ref={newGameRef}
         className='mx-auto p-2 shadow-md bg-green-300 text-green-700 rounded'
         onClick={e => {
           setGameActive(false)
