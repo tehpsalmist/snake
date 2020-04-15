@@ -58,12 +58,6 @@ const nextBoard = board => {
 
   snake.unshift(newHead)
 
-  if (!newHead.hasEaten) {
-    snake.pop()
-  } else {
-    apple = nextApple(checkMap(snake))
-  }
-
   const tail = snake[snake.length - 1]
 
   if (tail.hasEaten) {
@@ -72,10 +66,18 @@ const nextBoard = board => {
 
   const poops = board.poops.length > 10 ? board.poops.slice(1) : board.poops
 
+  const poopMap = checkMap(poops)
+
+  if (!newHead.hasEaten) {
+    snake.pop()
+  } else {
+    apple = nextApple({ ...checkMap(snake), ...poopMap })
+  }
+
   const projectedY = nextY(y, direction)
   const projectedX = nextX(x, direction)
 
-  if ((projectedX === apple.x && projectedY === apple.y) || checkMap(poops)[`${projectedX}-${projectedY}`]) {
+  if ((projectedX === apple.x && projectedY === apple.y) || poopMap[`${projectedX}-${projectedY}`]) {
     newHead.aboutToEat = true
   }
 
@@ -116,7 +118,7 @@ const willCollide = (snake, poops) => {
   })
 }
 
-const checkMap = snake => snake.reduce((map, { x, y }) => ({ ...map, [`${x}-${y}`]: 1 }), {})
+const checkMap = itemList => itemList.reduce((map, { x, y }) => ({ ...map, [`${x}-${y}`]: 1 }), {})
 
 const nextX = (original, direction) => {
   let x = original
