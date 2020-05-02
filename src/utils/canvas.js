@@ -229,7 +229,7 @@ export const drawSnakeBody = ({ x, y, from, to, hasEaten }, ctx) => {
  */
 export const drawSnakeTail = ({ x, y, from, to, hasEaten }, ctx) => {
   if (hasEaten) {
-    drawPoops([{ x, y }])
+    drawPoops([{ x, y }], ctx)
   }
 
   const actualX = actualSize(x)
