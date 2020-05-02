@@ -228,6 +228,10 @@ export const drawSnakeBody = ({ x, y, from, to, hasEaten }, ctx) => {
  * @param {CanvasRenderingContext2D} ctx
  */
 export const drawSnakeTail = ({ x, y, from, to, hasEaten }, ctx) => {
+  if (hasEaten) {
+    drawPoops([{ x, y }])
+  }
+
   const actualX = actualSize(x)
   const actualY = actualSize(y)
 
